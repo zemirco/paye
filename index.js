@@ -46,6 +46,10 @@ export default class PieChart {
       .innerRadius(0)
       .outerRadius(150)
 
+    this.arcOuter = arc()
+      .innerRadius(0)
+      .outerRadius(160)
+
     this.pie = pie()
       .sort(null)
 
@@ -65,16 +69,38 @@ export default class PieChart {
       .append('g')
       .attr('class', 'arc')
 
+    // append slices to be shown on hover
+    g.append('path')
+      .attr('d', this.arcOuter)
+      .attr('class', (d, i) => `path outer no${i}`)
+      .style('fill', (d, i) => this.color(i))
+      .style('stroke', '#fff')
+      .style('opacity', 0)
+      .each(function (d) { this._current = d })
+
+    // append real chart on top of to be highlighted slices
     g.append('path')
       .attr('d', this.arc)
       .style('fill', (d, i) => this.color(i))
+      .style('stroke', '#eee')
       // store the initial angles
       .each(function (d) { this._current = d })
+      .on('mouseover', (d, i) => {
+        this.svg
+          .select(`.path.outer.no${i}`)
+          .style('opacity', 0.35)
+      })
+      .on('mouseout', (d, i) => {
+        this.svg
+          .select(`.path.outer.no${i}`)
+          .style('opacity', 0)
+      })
 
     g.append('text')
       .attr('transform', d => `translate(${this.arc.centroid(d)})`)
       .attr('dy', '0.35em')
       .style('text-anchor', 'middle')
+      .style('pointer-events', 'none')
       .text('awesome')
       .each(function (d) { this._current = d })
   }
