@@ -19,10 +19,10 @@ class App extends Component {
   render () {
     return (
       <div>
-      <div ref='svg' />
-      <button onClick={this.onClick}>
-        Animate
-      </button>
+        <div ref='svg' />
+        <button onClick={this.onClick}>
+          Animate
+        </button>
       </div>
     )
   }

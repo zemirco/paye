@@ -30,6 +30,9 @@ export default class PieChart {
     this.init()
   }
 
+  /**
+   * Initialize chart without any data.
+   */
   init () {
     const {target, width, height} = this
     this.svg = select(target)
@@ -50,6 +53,9 @@ export default class PieChart {
         .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00'])
   }
 
+  /**
+   * Render chart.
+   */
   render () {
     const data = [1, 1, 2, 3, 5, 8, 13, 21]
     const g = this.svg
@@ -62,24 +68,50 @@ export default class PieChart {
     g.append('path')
       .attr('d', this.arc)
       .style('fill', (d, i) => this.color(i))
+      // store the initial angles
+      .each(function (d) { this._current = d })
+
+    g.append('text')
+      .attr('transform', d => `translate(${this.arc.centroid(d)})`)
+      .attr('dy', '0.35em')
+      .style('text-anchor', 'middle')
+      .text('awesome')
+      .each(function (d) { this._current = d })
   }
 
+  /**
+   * Update chart with enter, transition and exit selection.
+   */
   update () {
-    const data = [2, 10, 1, 3, 5, 20, 15, 21]
+    const data = [2, 10, 1, 3, 0, 20, 15, 21]
 
     const that = this
 
+    // transition slices
     function arcTween (a) {
       const i = interpolate(this._current, a)
       this._current = i(0)
       return (t) => that.arc(i(t))
     }
 
-    const path = this.svg
+    this.svg
       .selectAll('path')
       .data(this.pie(data))
       .transition()
       .attrTween('d', arcTween)
+
+    // transition text
+    function labelTween (a) {
+      const i = interpolate(this._current, a)
+      this._current = i(0)
+      return (t) => `translate(${that.arc.centroid(i(t))})`
+    }
+
+    this.svg
+      .selectAll('text')
+      .data(this.pie(data))
+      .transition()
+      .attrTween('transform', labelTween)
   }
 
 }
