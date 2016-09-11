@@ -81,6 +81,7 @@ export default class PieChart {
     // append real chart on top of to be highlighted slices
     g.append('path')
       .attr('d', this.arc)
+      .attr('class', (d, i) => `path inner no${i}`)
       .style('fill', (d, i) => this.color(i))
       .style('stroke', '#eee')
       // store the initial angles
@@ -113,7 +114,20 @@ export default class PieChart {
 
     const that = this
 
-    // transition slices
+    // outer
+    function arcOuterTween (a) {
+      const i = interpolate(this._current, a)
+      this._current = i(0)
+      return (t) => that.arcOuter(i(t))
+    }
+
+    this.svg
+      .selectAll('.path.outer')
+      .data(this.pie(data))
+      .transition()
+      .attrTween('d', arcOuterTween)
+
+    // inner
     function arcTween (a) {
       const i = interpolate(this._current, a)
       this._current = i(0)
@@ -121,7 +135,7 @@ export default class PieChart {
     }
 
     this.svg
-      .selectAll('path')
+      .selectAll('.path.inner')
       .data(this.pie(data))
       .transition()
       .attrTween('d', arcTween)
