@@ -50,8 +50,13 @@ export default class PieChart {
       .innerRadius(0)
       .outerRadius(160)
 
+    this.arcText = arc()
+      .innerRadius(75)
+      .outerRadius(150)
+
     this.pie = pie()
       .sort(null)
+      .value(d => d.value)
 
     this.color = scaleOrdinal()
         .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00'])
@@ -60,8 +65,7 @@ export default class PieChart {
   /**
    * Render chart.
    */
-  render () {
-    const data = [1, 1, 2, 3, 5, 8, 13, 21]
+  render (data) {
     const g = this.svg
       .selectAll('.arc')
       .data(this.pie(data))
@@ -98,20 +102,18 @@ export default class PieChart {
       })
 
     g.append('text')
-      .attr('transform', d => `translate(${this.arc.centroid(d)})`)
+      .attr('transform', d => `translate(${this.arcText.centroid(d)})`)
       .attr('dy', '0.35em')
       .style('text-anchor', 'middle')
       .style('pointer-events', 'none')
-      .text('awesome')
+      .text(d => d.data.text)
       .each(function (d) { this._current = d })
   }
 
   /**
    * Update chart with enter, transition and exit selection.
    */
-  update () {
-    const data = [2, 10, 1, 3, 0, 20, 15, 21]
-
+  update (data) {
     const that = this
 
     // outer
@@ -141,17 +143,17 @@ export default class PieChart {
       .attrTween('d', arcTween)
 
     // transition text
-    function labelTween (a) {
+    function textTween (a) {
       const i = interpolate(this._current, a)
       this._current = i(0)
-      return (t) => `translate(${that.arc.centroid(i(t))})`
+      return (t) => `translate(${that.arcText.centroid(i(t))})`
     }
 
     this.svg
       .selectAll('text')
       .data(this.pie(data))
       .transition()
-      .attrTween('transform', labelTween)
+      .attrTween('transform', textTween)
   }
 
 }
