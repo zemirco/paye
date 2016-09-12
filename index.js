@@ -1,7 +1,6 @@
 
 import {select} from 'd3-selection'
 import {pie, arc} from 'd3-shape'
-import {scaleOrdinal} from 'd3-scale'
 import {interpolate} from 'd3-interpolate'
 import 'd3-transition'
 
@@ -69,7 +68,7 @@ export default class PieChart {
       .data(this.pie(data))
       .enter()
       .append('g')
-      .attr('class', 'arc')
+      .attr('class', (d, i) => `arc no${i}`)
 
     // append slices to be shown on hover
     g.append('path')
@@ -89,14 +88,35 @@ export default class PieChart {
       // store the initial angles
       .each(function (d) { this._current = d })
       .on('mouseover', (d, i) => {
+        // highlight outer ring
         this.svg
           .select(`.path.outer.no${i}`)
           .style('opacity', 0.35)
+
+        // append tooltip
+        const width = 100
+        const height = 50
+        const left = this.arcText.centroid(d)[0]
+        const top = this.arcText.centroid(d)[1]
+        this.svg
+          .append('rect')
+          .attr('class', 'tip')
+          .attr('width', width)
+          .attr('height', height)
+          .attr('fill', '#fff')
+          .attr('stroke', '#eee')
+          .attr('transform', d => `translate(${left - (width / 2)}, ${top - (height / 2)})`)
+          .style('pointer-events', 'none')
       })
       .on('mouseout', (d, i) => {
+        // remove outer ring highlight
         this.svg
           .select(`.path.outer.no${i}`)
           .style('opacity', 0)
+        // remove tooltip from dom
+        this.svg
+          .select(`.tip`)
+          .remove()
       })
 
     g.append('text')
