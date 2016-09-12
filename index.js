@@ -57,15 +57,13 @@ export default class PieChart {
     this.pie = pie()
       .sort(null)
       .value(d => d.value)
-
-    this.color = scaleOrdinal()
-        .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00'])
   }
 
   /**
    * Render chart.
    */
   render (data) {
+    // chart
     const g = this.svg
       .selectAll('.arc')
       .data(this.pie(data))
@@ -77,7 +75,7 @@ export default class PieChart {
     g.append('path')
       .attr('d', this.arcOuter)
       .attr('class', (d, i) => `path outer no${i}`)
-      .style('fill', (d, i) => this.color(i))
+      .style('fill', d => d.data.background)
       .style('stroke', '#fff')
       .style('opacity', 0)
       .each(function (d) { this._current = d })
@@ -86,7 +84,7 @@ export default class PieChart {
     g.append('path')
       .attr('d', this.arc)
       .attr('class', (d, i) => `path inner no${i}`)
-      .style('fill', (d, i) => this.color(i))
+      .style('fill', d => d.data.background)
       .style('stroke', '#eee')
       // store the initial angles
       .each(function (d) { this._current = d })
@@ -104,10 +102,40 @@ export default class PieChart {
     g.append('text')
       .attr('transform', d => `translate(${this.arcText.centroid(d)})`)
       .attr('dy', '0.35em')
+      .attr('fill', d => d.data.color)
       .style('text-anchor', 'middle')
       .style('pointer-events', 'none')
       .text(d => d.data.text)
       .each(function (d) { this._current = d })
+
+    // legend
+    const legend = this.svg
+      .selectAll('.legend')
+      .data(this.pie(data))
+      .enter()
+      .append('g')
+      .attr('transform', (d, i) => `translate(${250}, ${i * 20})`)
+      .attr('class', 'legend')
+      .on('mouseover', (d, i) => {
+        this.svg
+          .select(`.path.outer.no${i}`)
+          .style('opacity', 0.35)
+      })
+      .on('mouseout', (d, i) => {
+        this.svg
+          .select(`.path.outer.no${i}`)
+          .style('opacity', 0)
+      })
+
+    legend.append('rect')
+      .attr('width', 10)
+      .attr('height', 10)
+      .attr('fill', d => d.data.background)
+
+    legend.append('text')
+      .attr('x', 20)
+      .attr('y', 10)
+      .text(d => d.data.text)
   }
 
   /**

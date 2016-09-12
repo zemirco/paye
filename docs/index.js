@@ -4,15 +4,15 @@ import ReactDOM from 'react-dom'
 import PieChart from '../'
 
 const a = [
-  {value: 10, text: 'Error'},
-  {value: 5, text: 'Zero'},
-  {value: 18, text: 'Ace'}
+  {value: 10, text: 'Error', background: '#4DB6AC'},
+  {value: 5, text: 'Zero', background: '#009688', color: '#fff'},
+  {value: 18, text: 'Ace', background: '#00796B', color: '#fff'}
 ]
 
 const b = [
-  {value: 7, text: 'Error'},
-  {value: 12, text: 'Zero'},
-  {value: 16, text: 'Ace'}
+  {value: 7, text: 'Error', background: '#4DB6AC'},
+  {value: 12, text: 'Zero', background: '#009688', color: '#fff'},
+  {value: 16, text: 'Ace', background: '#00796B', color: '#fff'}
 ]
 
 class App extends Component {
