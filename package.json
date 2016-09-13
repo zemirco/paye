@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/zemirco/paye.git"
   },
-  "author": "",
+  "author": "Mirco Zeiss <mirco.zeiss@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/zemirco/paye/issues"
