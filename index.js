@@ -62,6 +62,9 @@ export default class PieChart {
    * Render chart.
    */
   render (data) {
+    // calc total amount for calculating percentages
+    const total = data.reduce((p, c) => p + c.value, 0)
+
     // chart
     const g = this.svg
       .selectAll('.arc')
@@ -94,19 +97,36 @@ export default class PieChart {
           .style('opacity', 0.35)
 
         // append tooltip
-        const width = 100
+        const width = 80
         const height = 50
         const left = this.arcText.centroid(d)[0]
         const top = this.arcText.centroid(d)[1]
-        this.svg
-          .append('rect')
+
+        const tip = this.svg
+          .append('g')
           .attr('class', 'tip')
+          .style('pointer-events', 'none')
+          .attr('transform', () => `translate(${left - (width / 2)}, ${top - (height / 2)})`)
+
+        tip
+          .append('rect')
           .attr('width', width)
           .attr('height', height)
           .attr('fill', '#fff')
           .attr('stroke', '#eee')
-          .attr('transform', d => `translate(${left - (width / 2)}, ${top - (height / 2)})`)
-          .style('pointer-events', 'none')
+
+        // title, e.g. 'Ace'
+        tip.append('text')
+          .attr('x', 5)
+          .attr('y', 20)
+          .text(() => d.data.text)
+
+        // subtitle, absolute and relative value
+        tip.append('text')
+          .attr('x', 5)
+          .attr('y', 40)
+          .text(() => `${d.data.value} (${(d.data.value / total * 100).toFixed(1)}%)`)
+          .style('font-weight', 'bold')
       })
       .on('mouseout', (d, i) => {
         // remove outer ring highlight
@@ -130,12 +150,13 @@ export default class PieChart {
 
     // legend
     const legend = this.svg
-      .selectAll('.legend')
+      .append('g')
+      .attr('transform', `translate(${160 + 20}, ${-30})`)
+      .selectAll('g')
       .data(this.pie(data))
       .enter()
       .append('g')
-      .attr('transform', (d, i) => `translate(${250}, ${i * 20})`)
-      .attr('class', 'legend')
+      .attr('transform', (d, i) => `translate(0, ${i * 22})`)
       .on('mouseover', (d, i) => {
         this.svg
           .select(`.path.outer.no${i}`)
@@ -148,13 +169,14 @@ export default class PieChart {
       })
 
     legend.append('rect')
-      .attr('width', 10)
-      .attr('height', 10)
+      .attr('width', 16)
+      .attr('height', 16)
       .attr('fill', d => d.data.background)
 
     legend.append('text')
-      .attr('x', 20)
-      .attr('y', 10)
+      .attr('x', 25)
+      .attr('y', 8)
+      .attr('dy', '0.35em')
       .text(d => d.data.text)
   }
 
