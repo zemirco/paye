@@ -5,18 +5,7 @@ import {interpolate} from 'd3-interpolate'
 import 'd3-transition'
 
 const defaults = {
-
-  width: 800,
-
-  height: 400,
-
-  margin: {
-    top: 15,
-    right: 10,
-    bottom: 35,
-    left: 60
-  }
-
+  height: 400
 }
 
 /**
@@ -34,24 +23,25 @@ export default class PieChart {
    */
   init () {
     const {target, width, height} = this
+    const radius = height / 2
     this.svg = select(target)
       .append('svg')
       .attr('width', width)
       .attr('height', height)
       .append('g')
-      .attr('transform', `translate(${width / 2}, ${height / 2})`)
+      .attr('transform', `translate(${radius}, ${radius})`)
 
     this.arc = arc()
       .innerRadius(0)
-      .outerRadius(150)
+      .outerRadius(radius - 10)
 
     this.arcOuter = arc()
       .innerRadius(0)
-      .outerRadius(160)
+      .outerRadius(radius)
 
     this.arcText = arc()
-      .innerRadius(75)
-      .outerRadius(150)
+      .innerRadius((1 / 3) * (radius - 10))
+      .outerRadius(radius - 10)
 
     this.pie = pie()
       .sort(null)
@@ -97,8 +87,8 @@ export default class PieChart {
           .style('opacity', 0.35)
 
         // append tooltip
-        const width = 80
-        const height = 50
+        const width = 70
+        const height = 40
         const left = this.arcText.centroid(d)[0]
         const top = this.arcText.centroid(d)[1]
 
@@ -117,16 +107,18 @@ export default class PieChart {
 
         // title, e.g. 'Ace'
         tip.append('text')
-          .attr('x', 5)
-          .attr('y', 20)
+          .attr('x', 4)
+          .attr('y', 16)
           .text(() => d.data.text)
+          .style('font-size', '12px')
 
         // subtitle, absolute and relative value
         tip.append('text')
-          .attr('x', 5)
-          .attr('y', 40)
+          .attr('x', 4)
+          .attr('y', 32)
           .text(() => `${d.data.value} (${(d.data.value / total * 100).toFixed(1)}%)`)
           .style('font-weight', 'bold')
+          .style('font-size', '12px')
       })
       .on('mouseout', (d, i) => {
         // remove outer ring highlight
@@ -145,13 +137,16 @@ export default class PieChart {
       .attr('fill', d => d.data.color)
       .style('text-anchor', 'middle')
       .style('pointer-events', 'none')
+      .style('font-size', '12px')
       .text(d => d.data.text)
       .each(function (d) { this._current = d })
 
     // legend
     const legend = this.svg
       .append('g')
-      .attr('transform', `translate(${160 + 20}, ${-30})`)
+      // legend is 60px high => 30px
+      // this.height / 2 is radius + some margin
+      .attr('transform', `translate(${(this.height / 2) + 20}, ${-30})`)
       .selectAll('g')
       .data(this.pie(data))
       .enter()

@@ -19,6 +19,7 @@ class App extends Component {
 
   componentDidMount () {
     this.pieChart = new PieChart({
+      height: 200,
       target: this.refs.svg
     })
     this.pieChart.render(a)
