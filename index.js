@@ -60,6 +60,7 @@ export default class PieChart {
       .selectAll('.arc')
       .data(this.pie(data))
       .enter()
+      .filter(d => d.data.value !== 0)
       .append('g')
       .attr('class', (d, i) => `arc no${i}`)
 
@@ -144,12 +145,11 @@ export default class PieChart {
     // legend
     const legend = this.svg
       .append('g')
-      // legend is 60px high => 30px
-      // this.height / 2 is radius + some margin
-      .attr('transform', `translate(${(this.height / 2) + 20}, ${-30})`)
+      .attr('class', 'legend')
       .selectAll('g')
       .data(this.pie(data))
       .enter()
+      .filter(d => d.data.value !== 0)
       .append('g')
       .attr('transform', (d, i) => `translate(0, ${i * 22})`)
       .on('mouseover', (d, i) => {
@@ -173,6 +173,18 @@ export default class PieChart {
       .attr('y', 8)
       .attr('dy', '0.35em')
       .text(d => d.data.text)
+
+    // now position legend correctly
+    const legendHeight = this.svg
+      .select('.legend')
+      .node()
+      .getBBox()
+      .height
+
+      // this.height / 2 is radius + some margin
+    this.svg
+      .select('.legend')
+      .attr('transform', `translate(${(this.height / 2) + 20}, ${- legendHeight / 2})`)
   }
 
   /**
