@@ -132,6 +132,7 @@ export default class PieChart {
           .remove()
       })
 
+    const that = this
     g.append('text')
       .attr('transform', d => `translate(${this.arcText.centroid(d)})`)
       .attr('dy', '0.35em')
@@ -141,6 +142,37 @@ export default class PieChart {
       .style('font-size', '12px')
       .text(d => d.data.text)
       .each(function (d) { this._current = d })
+      .each(function (d) {
+        const bb = this.getBBox()
+        const center = that.arc.centroid(d)
+
+        const topLeft = {
+          x : center[0] + bb.x,
+          y : center[1] + bb.y
+        }
+
+        const topRight = {
+          x : topLeft.x + bb.width,
+          y : topLeft.y
+        }
+
+        const bottomLeft = {
+          x : topLeft.x,
+          y : topLeft.y + bb.height
+        }
+
+        const bottomRight = {
+          x : topLeft.x + bb.width,
+          y : topLeft.y + bb.height
+        }
+
+        d.visible = that.pointIsInArc(topLeft, d, that.arc) &&
+          that.pointIsInArc(topRight, d, that.arc) &&
+          that.pointIsInArc(bottomLeft, d, that.arc) &&
+          that.pointIsInArc(bottomRight, d, that.arc)
+
+      })
+    .style('display', d => d.visible ? null : 'none')
 
     // legend
     const legend = this.svg
@@ -185,6 +217,22 @@ export default class PieChart {
     this.svg
       .select('.legend')
       .attr('transform', `translate(${(this.height / 2) + 20}, ${- legendHeight / 2})`)
+  }
+
+  pointIsInArc(pt, ptData, d3Arc) {
+    // Center of the arc is assumed to be 0,0
+    //   // (pt.x, pt.y) are assumed to be relative to the center
+    const r1 = d3Arc.innerRadius()(ptData) // Note: Using the innerRadius
+    const r2 = d3Arc.outerRadius()(ptData)
+    const theta1 = d3Arc.startAngle()(ptData)
+    const theta2 = d3Arc.endAngle()(ptData)
+
+    const dist = pt.x * pt.x + pt.y * pt.y
+    let angle = Math.atan2(pt.x, -pt.y) // Note: different coordinate system.
+
+    angle = (angle < 0) ? (angle + Math.PI * 2) : angle
+
+    return (r1 * r1 <= dist) && (dist <= r2 * r2) && (theta1 <= angle) && (angle <= theta2)
   }
 
   /**

@@ -15,15 +15,27 @@ const b = [
   {value: 16, text: 'Ace', background: '#00796B', color: '#fff'}
 ]
 
-const zeroSlice = [
+const zeroSliceA = [
   {value: 7, text: 'Error', background: '#4DB6AC'},
   {value: 0, text: 'Zero', background: '#009688', color: '#fff'},
+  {value: 16, text: 'Ace', background: '#00796B', color: '#fff'}
+]
+
+const zeroSliceB = [
+  {value: 7, text: 'Error', background: '#4DB6AC'},
+  {value: 2, text: 'Zero', background: '#009688', color: '#fff'},
   {value: 16, text: 'Ace', background: '#00796B', color: '#fff'}
 ]
 
 const singleSlice = [
   {value: 0, text: 'Error', background: '#4DB6AC'},
   {value: 0, text: 'Zero', background: '#009688', color: '#fff'},
+  {value: 16, text: 'Ace', background: '#00796B', color: '#fff'}
+]
+
+const smallSlice = [
+  {value: 2, text: 'Error', background: '#4DB6AC'},
+  {value: 18, text: 'Zero', background: '#009688', color: '#fff'},
   {value: 16, text: 'Ace', background: '#00796B', color: '#fff'}
 ]
 
@@ -40,17 +52,24 @@ class App extends Component {
       height: 200,
       target: this.refs.zeroSlice
     })
-    this.zeroSlicePieChart.render(zeroSlice)
+    this.zeroSlicePieChart.render(zeroSliceA)
     // single slice
     this.singleSlicePieChart = new PieChart({
       height: 200,
       target: this.refs.singleSlice
     })
     this.singleSlicePieChart.render(singleSlice)
+    // small slice
+    this.smallSlicePieChart = new PieChart({
+      height: 200,
+      target: this.refs.smallSlice
+    })
+    this.smallSlicePieChart.render(smallSlice)
   }
 
   onClick = () => {
     this.pieChart.update(b)
+    this.zeroSlicePieChart.update(zeroSliceB)
   }
 
   render () {
@@ -70,6 +89,10 @@ class App extends Component {
         <section>
           <h2>single slice / 100%</h2>
           <div ref='singleSlice' />
+        </section>
+        <section>
+          <h2>very small slice without text</h2>
+          <div ref='smallSlice' />
         </section>
       </div>
     )
