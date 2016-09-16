@@ -60,7 +60,7 @@ export default class PieChart {
       .selectAll('.arc')
       .data(this.pie(data))
       .enter()
-      .filter(d => d.data.value !== 0)
+      // .filter(d => d.data.value !== 0)
       .append('g')
       .attr('class', (d, i) => `arc no${i}`)
 
@@ -175,53 +175,12 @@ export default class PieChart {
     .style('display', d => d.visible ? null : 'none')
 
     // legend
-    const legend = this.svg
-      .append('g')
-      .attr('class', 'legend')
-      .selectAll('g')
-      .data(this.pie(data))
-      .enter()
-      .filter(d => d.data.value !== 0)
-      .append('g')
-      .attr('transform', (d, i) => `translate(0, ${i * 22})`)
-      .on('mouseover', (d, i) => {
-        this.svg
-          .select(`.path.outer.no${i}`)
-          .style('opacity', 0.35)
-      })
-      .on('mouseout', (d, i) => {
-        this.svg
-          .select(`.path.outer.no${i}`)
-          .style('opacity', 0)
-      })
-
-    legend.append('rect')
-      .attr('width', 16)
-      .attr('height', 16)
-      .attr('fill', d => d.data.background)
-
-    legend.append('text')
-      .attr('x', 25)
-      .attr('y', 8)
-      .attr('dy', '0.35em')
-      .text(d => d.data.text)
-
-    // now position legend correctly
-    const legendHeight = this.svg
-      .select('.legend')
-      .node()
-      .getBBox()
-      .height
-
-      // this.height / 2 is radius + some margin
-    this.svg
-      .select('.legend')
-      .attr('transform', `translate(${(this.height / 2) + 20}, ${- legendHeight / 2})`)
+    this.legend(data)
   }
 
   pointIsInArc(pt, ptData, d3Arc) {
     // Center of the arc is assumed to be 0,0
-    //   // (pt.x, pt.y) are assumed to be relative to the center
+    // (pt.x, pt.y) are assumed to be relative to the center
     const r1 = d3Arc.innerRadius()(ptData) // Note: Using the innerRadius
     const r2 = d3Arc.outerRadius()(ptData)
     const theta1 = d3Arc.startAngle()(ptData)
@@ -279,6 +238,51 @@ export default class PieChart {
       .data(this.pie(data))
       .transition()
       .attrTween('transform', textTween)
+  }
+
+  legend (data) {
+    // legend
+    const legend = this.svg
+      .append('g')
+      .attr('class', 'legend')
+      .selectAll('g')
+      .data(this.pie(data))
+      .enter()
+      .append('g')
+      .attr('transform', (d, i) => `translate(0, ${i * 22})`)
+      .on('mouseover', (d, i) => {
+        this.svg
+          .select(`.path.outer.no${i}`)
+          .style('opacity', 0.35)
+      })
+      .on('mouseout', (d, i) => {
+        this.svg
+          .select(`.path.outer.no${i}`)
+          .style('opacity', 0)
+      })
+
+    legend.append('rect')
+      .attr('width', 16)
+      .attr('height', 16)
+      .attr('fill', d => d.data.background)
+
+    legend.append('text')
+      .attr('x', 25)
+      .attr('y', 8)
+      .attr('dy', '0.35em')
+      .text(d => d.data.text)
+
+    // now position legend correctly
+    const legendHeight = this.svg
+      .select('.legend')
+      .node()
+      .getBBox()
+      .height
+
+      // this.height / 2 is radius + some margin
+    this.svg
+      .select('.legend')
+      .attr('transform', `translate(${(this.height / 2) + 20}, ${- legendHeight / 2})`)
   }
 
 }
