@@ -82,6 +82,9 @@ export default class PieChart {
       // store the initial angles
       .each(function (d) { this._current = d })
       .on('mouseover', (d, i) => {
+        // prevent highlight and tooltip when slice has zero value
+        if (!d.data.value) return
+
         // highlight outer ring
         this.svg
           .select(`.path.outer.no${i}`)
@@ -122,6 +125,7 @@ export default class PieChart {
           .style('font-size', '12px')
       })
       .on('mouseout', (d, i) => {
+        if (!d.data.value) return
         // remove outer ring highlight
         this.svg
           .select(`.path.outer.no${i}`)
@@ -147,38 +151,37 @@ export default class PieChart {
         const center = that.arc.centroid(d)
 
         const topLeft = {
-          x : center[0] + bb.x,
-          y : center[1] + bb.y
+          x: center[0] + bb.x,
+          y: center[1] + bb.y
         }
 
         const topRight = {
-          x : topLeft.x + bb.width,
-          y : topLeft.y
+          x: topLeft.x + bb.width,
+          y: topLeft.y
         }
 
         const bottomLeft = {
-          x : topLeft.x,
-          y : topLeft.y + bb.height
+          x: topLeft.x,
+          y: topLeft.y + bb.height
         }
 
         const bottomRight = {
-          x : topLeft.x + bb.width,
-          y : topLeft.y + bb.height
+          x: topLeft.x + bb.width,
+          y: topLeft.y + bb.height
         }
 
         d.visible = that.pointIsInArc(topLeft, d, that.arc) &&
           that.pointIsInArc(topRight, d, that.arc) &&
           that.pointIsInArc(bottomLeft, d, that.arc) &&
           that.pointIsInArc(bottomRight, d, that.arc)
-
       })
-    .style('display', d => d.visible ? null : 'none')
+    .style('opacity', d => d.visible ? 1 : 0)
 
     // legend
     this.legend(data)
   }
 
-  pointIsInArc(pt, ptData, d3Arc) {
+  pointIsInArc (pt, ptData, d3Arc) {
     // Center of the arc is assumed to be 0,0
     // (pt.x, pt.y) are assumed to be relative to the center
     const r1 = d3Arc.innerRadius()(ptData) // Note: Using the innerRadius
@@ -238,6 +241,36 @@ export default class PieChart {
       .data(this.pie(data))
       .transition()
       .attrTween('transform', textTween)
+      .each(function (d) {
+        const bb = this.getBBox()
+        const center = that.arc.centroid(d)
+
+        const topLeft = {
+          x: center[0] + bb.x,
+          y: center[1] + bb.y
+        }
+
+        const topRight = {
+          x: topLeft.x + bb.width,
+          y: topLeft.y
+        }
+
+        const bottomLeft = {
+          x: topLeft.x,
+          y: topLeft.y + bb.height
+        }
+
+        const bottomRight = {
+          x: topLeft.x + bb.width,
+          y: topLeft.y + bb.height
+        }
+
+        d.visible = that.pointIsInArc(topLeft, d, that.arc) &&
+          that.pointIsInArc(topRight, d, that.arc) &&
+          that.pointIsInArc(bottomLeft, d, that.arc) &&
+          that.pointIsInArc(bottomRight, d, that.arc)
+      })
+      .style('opacity', d => d.visible ? 1 : 0)
   }
 
   legend (data) {
@@ -282,7 +315,7 @@ export default class PieChart {
       // this.height / 2 is radius + some margin
     this.svg
       .select('.legend')
-      .attr('transform', `translate(${(this.height / 2) + 20}, ${- legendHeight / 2})`)
+      .attr('transform', `translate(${(this.height / 2) + 20}, ${-legendHeight / 2})`)
   }
 
 }
