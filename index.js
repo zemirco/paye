@@ -5,7 +5,10 @@ import {interpolate} from 'd3-interpolate'
 import 'd3-transition'
 
 const defaults = {
-  height: 400
+  height: 400,
+  keyBackgroundColor: 'background',
+  keyFontColor: 'color',
+  keyText: 'text'
 }
 
 /**
@@ -68,7 +71,7 @@ export default class PieChart {
     g.append('path')
       .attr('d', this.arcOuter)
       .attr('class', (d, i) => `path outer no${i}`)
-      .style('fill', d => d.data.background)
+      .style('fill', d => d.data[this.keyBackgroundColor])
       .style('stroke', '#fff')
       .style('opacity', 0)
       .each(function (d) { this._current = d })
@@ -77,7 +80,7 @@ export default class PieChart {
     g.append('path')
       .attr('d', this.arc)
       .attr('class', (d, i) => `path inner no${i}`)
-      .style('fill', d => d.data.background)
+      .style('fill', d => d.data[this.keyBackgroundColor])
       .style('stroke', '#eee')
       // store the initial angles
       .each(function (d) { this._current = d })
@@ -113,7 +116,7 @@ export default class PieChart {
         tip.append('text')
           .attr('x', 4)
           .attr('y', 16)
-          .text(() => d.data.text)
+          .text(() => d.data[this.keyText])
           .style('font-size', '12px')
 
         // subtitle, absolute and relative value
@@ -140,7 +143,7 @@ export default class PieChart {
     g.append('text')
       .attr('transform', d => `translate(${this.arcText.centroid(d)})`)
       .attr('dy', '0.35em')
-      .attr('fill', d => d.data.color)
+      .attr('fill', d => d.data[this.keyFontColor])
       .style('text-anchor', 'middle')
       .style('pointer-events', 'none')
       .style('font-size', '12px')
@@ -297,7 +300,7 @@ export default class PieChart {
     legend.append('rect')
       .attr('width', 16)
       .attr('height', 16)
-      .attr('fill', d => d.data.background)
+      .attr('fill', d => d.data[this.keyBackgroundColor])
 
     legend.append('text')
       .attr('x', 25)
