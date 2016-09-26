@@ -1,6 +1,6 @@
 {
   "name": "paye",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "D3 pie chart",
   "main": "index.js",
   "scripts": {
