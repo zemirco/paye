@@ -147,7 +147,7 @@ export default class PieChart {
       .style('text-anchor', 'middle')
       .style('pointer-events', 'none')
       .style('font-size', '12px')
-      .text(d => d.data.text)
+      .text(d => d.data[this.keyText])
       .each(function (d) { this._current = d })
       .each(function (d) {
         const bb = this.getBBox()
@@ -306,7 +306,7 @@ export default class PieChart {
       .attr('x', 25)
       .attr('y', 8)
       .attr('dy', '0.35em')
-      .text(d => d.data.text)
+      .text(d => d.data[this.keyText])
 
     // now position legend correctly
     const legendHeight = this.svg
